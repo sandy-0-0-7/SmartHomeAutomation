@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Light Control</title>
+    <!-- Firebase SDK (Module Version) -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
+
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAyCiaIPOdM7n4dvHNv94qcNvYRCsscKDA",
+            authDomain: "smart-light-2e36a.firebaseapp.com",
+            databaseURL: "https://smart-light-2e36a-default-rtdb.firebaseio.com",
+            projectId: "smart-light-2e36a",
+            storageBucket: "smart-light-2e36a.firebasestorage.app",
+            messagingSenderId: "169161397055",
+            appId: "1:169161397055:web:688b346c5b769c2811798a"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Function to update the database
+        function updateDatabase(value) {
+            set(ref(database, 'light'), value)
+                .then(() => console.log('Database updated successfully'))
+                .catch(error => console.error('Error updating database:', error));
+        }
+
+        // Real-time listener for database changes
+        const lightStatusRef = ref(database, 'light');
+        onValue(lightStatusRef, (snapshot) => {
+            const value = snapshot.val();
+            const lightStatusElement = document.getElementById('lightStatus');
+            if (value === 1) {
+                lightStatusElement.textContent = "ON";
+                lightStatusElement.style.color = "green";
+            } else if (value === 0) {
+                lightStatusElement.textContent = "OFF";
+                lightStatusElement.style.color = "red";
+            } else {
+                lightStatusElement.textContent = "Unknown";
+                lightStatusElement.style.color = "gray";
+            }
+        });
+
+        // Make functions available globally
+        window.updateDatabase = updateDatabase;
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .status {
+            font-size: 1.5em;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Smart Light Control</h1>
+    <button id="onButton" onclick="updateDatabase(1)">Turn ON</button>
+    <button id="offButton" onclick="updateDatabase(0)">Turn OFF</button>
+
+    <div class="status">
+        Light Status: <span id="lightStatus">Loading...</span>
+    </div>
+</body>
+</html>
